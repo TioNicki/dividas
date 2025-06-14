@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Minhas Dívidas</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f4f4f4;
+      color: #333;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    h1 {
+      margin-top: 20px;
+      font-size: 28px;
+    }
+
+    #menu {
+      display: flex;
+      gap: 20px;
+      margin: 30px 0;
+    }
+
+    .secao {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      width: 100%;
+      max-width: 400px;
+    }
+
+    .visible {
+      display: flex !important;
+    }
+
+    .nome-pessoa {
+      background: white;
+      margin: 10px 0;
+      padding: 10px 15px;
+      border-radius: 10px;
+      display: flex;
+      justify-content: space-between;
+      width: 100%;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      cursor: pointer;
+    }
+
+    <style>
+  .dividas-lista {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .divida-item {
+    background-color: white;
+    padding: 15px 20px;
+    border-radius: 12px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    border: 1px solid #e0e0e0;
+    transition: transform 0.2s;
+  }
+
+  .divida-item:hover {
+    transform: translateY(-3px);
+  }
+
+  .divida-item span {
+    display: block;
+    margin-bottom: 6px;
+    color: #333;
+    font-size: 15px;
+  }
+
+  .divida-item .status {
+    padding: 4px 8px;
+    border-radius: 8px;
+    color: white;
+    font-weight: bold;
+    display: inline-block;
+    font-size: 13px;
+  }
+
+  .status.aberto {
+    background-color: #f44336;
+  }
+
+  .status.pago {
+    background-color: #4caf50;
+  }
+
+  .status.parcial {
+    background-color: #ff9800;
+  }
+
+  .divida-item button {
+    margin-top: 8px;
+    padding: 6px 12px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+  }
+
+  .divida-item button:hover {
+    background-color: #0056b3;
+  }
+
+  .quantidade {
+    font-size: 20px;
+    font-weight: bold;
+    margin-bottom: 12px;
+  }
+  
+    .voltar {
+      margin-top: 20px;
+    }
+
+    .voltar button {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 10px;
+      background: #555;
+      color: white;
+      cursor: pointer;
+    }
+
+    #btnAddDivida {
+      position: fixed;
+      bottom: 30px;
+      right: 30px;
+      background: #008cff;
+      color: white;
+      font-size: 28px;
+      border: none;
+      border-radius: 50%;
+      width: 60px;
+      height: 60px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+      display: none;
+      cursor: pointer;
+    }
+
+    button.menu-btn {
+      padding: 15px 30px;
+      font-size: 18px;
+      border-radius: 10px;
+      border: none;
+      cursor: pointer;
+      background: #007bff;
+      color: white;
+    }
+    .edit-input, .edit-select {
+  width: 100%;
+  margin-bottom: 10px;
+  display: block;
+  padding: 8px 10px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 14px;
+  box-sizing: border-box;
+  font-family: inherit;
+}
+
+.edit-buttons {
+  display: flex;
+  gap: 10px;
+}
+
+.btn-salvar, .btn-cancelar {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.btn-salvar {
+  background-color: #28a745;
+  color: white;
+}
+
+.btn-cancelar {
+  background-color: #dc3545;
+  color: white;
+}
+#lista-nomes-devo, #lista-nomes-devem {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  width: 100%;
+}
+.divida-item.edit-mode {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 10px; /* Espaço entre os campos */
+}
+
+
+  </style>
+</head>
+<body>
+
+  <h1>Controle de Dívidas</h1>
+
+  <div id="menu">
+    <button class="menu-btn" onclick="abrirSecao('devo')">DEVO</button>
+    <button class="menu-btn" onclick="abrirSecao('devem')">DEVEM</button>
+  </div>
+  
+
+  <!-- Seção: O que devo -->
+  <section id="devo" class="secao">
+<ul id="lista-nomes-devo"></ul>
+    <div id="detalhes-dividas-devo" class="detalhes-dividas" style="display:none;"></div>
+    <div class="voltar"><button onclick="voltarMenu()">⬅ Voltar</button></div>
+  </section>
+
+  <!-- Seção: O que me devem -->
+  <section id="devem" class="secao">
+<ul id="lista-nomes-devem"></ul>
+    <div id="detalhes-dividas-devem" class="detalhes-dividas" style="display:none;"></div>
+    <div class="voltar"><button onclick="voltarMenu()">⬅ Voltar</button></div>
+  </section>
+
+<!-- Botão de adicionar -->
+<button id="btnAddDivida" onclick="abrirFormularioContextual()" title="+">+</button>
+<!-- Formulário para adicionar nome -->
+<div id="formAdicionarNome" style="display:none; position: fixed; bottom: 110px; right: 30px; background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 8px rgba(0,0,0,0.3); max-width: 300px;">
+  <input type="text" id="inputNome" placeholder="Nome da pessoa" style="width: 100%; padding: 10px; margin-bottom: 10px; border-radius: 8px; border: 1px solid #ccc;">
+  <button onclick="adicionarNome()" style="width: 100%; padding: 10px; background: #28a745; color: white; border: none; border-radius: 8px; cursor: pointer;">Adicionar</button>
+</div>
+<!-- Formulário para adicionar dívida -->
+<div id="formAdicionarDivida" style="display:none; position: fixed; bottom: 110px; right: 30px; background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 8px rgba(0,0,0,0.3); max-width: 300px;">
+  <input type="text" id="inputDescricao" placeholder="Descrição" class="edit-input">
+  <input type="number" id="inputValor" placeholder="Valor" class="edit-input">
+  <input type="date" id="inputVencimento" placeholder="Data de Vencimento" class="edit-input">
+  <select id="inputStatus" class="edit-select">
+    <option value="aberto">Aberto</option>
+    <option value="pago">Pago</option>
+    <option value="parcial">Parcial</option>
+  </select>
+  <button onclick="adicionarDivida()" style="width: 100%; padding: 10px; background: #007bff; color: white; border: none; border-radius: 8px; cursor: pointer;">Salvar Dívida</button>
+</div>
+<!-- Formulário para editar dívida -->
+<div id="formEditarDivida" style="display:none; position: fixed; bottom: 110px; right: 30px; background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 8px rgba(0,0,0,0.3); max-width: 300px;">
+  <input type="text" id="editDescricao" placeholder="Descrição" class="edit-input">
+  <input type="number" id="editValor" placeholder="Valor" class="edit-input">
+  <input type="date" id="editVencimento" placeholder="Data de Vencimento" class="edit-input">
+
+  <select id="editStatus" class="edit-select">
+    <option value="aberto">Aberto</option>
+    <option value="pago">Pago</option>
+    <option value="parcial">Parcial</option>
+  </select>
+
+  <button onclick="salvarEdicaoDivida()" style="width: 100%; padding: 10px; background: #ffc107; color: white; border: none; border-radius: 8px; cursor: pointer;">Salvar Edição</button>
+</div>
+<script>
+  let tipoAberto = null;  // controla se a seção 'devo' ou 'devem' está aberta
+  let nomeAberto = null;  // nome da pessoa selecionada
+  let lista = [];         // lista de dívidas da pessoa selecionada
+
+  // Carrega dados do localStorage ou inicializa estrutura vazia
+  let dividas = JSON.parse(localStorage.getItem('dividas'));
+  if (!dividas || typeof dividas !== 'object') {
+    dividas = { devo: {}, devem: {} };
+  }
+  if (!dividas.devo || typeof dividas.devo !== 'object') dividas.devo = {};
+  if (!dividas.devem || typeof dividas.devem !== 'object') dividas.devem = {};
+
+  // Função para abrir seção (devo/devem)
+  function abrirSecao(tipo) {
+    tipoAberto = tipo;
+    nomeAberto = null;  // reset nome selecionado
+
+    document.getElementById("menu").style.display = "none";
+    document.getElementById("devo").classList.remove("visible");
+    document.getElementById("devem").classList.remove("visible");
+    document.getElementById(tipo).classList.add("visible");
+
+    document.getElementById("btnAddDivida").style.display = "block";
+    document.getElementById("formAdicionarNome").style.display = "none";
+    document.getElementById("formAdicionarDivida").style.display = "none";
+
+    atualizarLista(tipo);
+  }
+
+  // Alterna entre formulário para adicionar nome ou dívida conforme contexto
+  function abrirFormularioContextual() {
+    if (nomeAberto && tipoAberto) {
+      // Formulário dívida
+      const formDivida = document.getElementById("formAdicionarDivida");
+      formDivida.style.display = formDivida.style.display === 'none' ? 'block' : 'none';
+      document.getElementById("formAdicionarNome").style.display = 'none';
+    } else {
+      // Formulário nome
+      const formNome = document.getElementById("formAdicionarNome");
+      formNome.style.display = formNome.style.display === 'none' ? 'block' : 'none';
+      document.getElementById("formAdicionarDivida").style.display = 'none';
+    }
+  }
+
+  // Adiciona dívida para pessoa e tipo abertos
+  function adicionarDivida() {
+    if (!nomeAberto || !tipoAberto) {
+      alert("Selecione uma pessoa para adicionar a dívida.");
+      return;
+    }
+
+    const descricao = document.getElementById("inputDescricao").value.trim();
+    const valor = parseFloat(document.getElementById("inputValor").value);
+    const status = document.getElementById("inputStatus").value;
+
+    if (!descricao || isNaN(valor)) {
+      alert("Preencha descrição e valor válidos.");
+      return;
+    }
+
+    if (!dividas[tipoAberto][nomeAberto]) {
+      dividas[tipoAberto][nomeAberto] = [];
+    }
+
+    dividas[tipoAberto][nomeAberto].push({
+      descricao,
+      valor,
+      status,
+      data: new Date().toISOString().slice(0, 10),
+      vencimento: ''
+    });
+
+    salvarDados();
+
+    document.getElementById("formAdicionarDivida").style.display = 'none';
+
+    // Limpa campos após adicionar
+    document.getElementById("inputDescricao").value = '';
+    document.getElementById("inputValor").value = '';
+    document.getElementById("inputStatus").value = 'aberto';
+
+    mostrarDetalhes(tipoAberto, nomeAberto);
+  }
+
+  // Adiciona um novo nome na lista da seção atual
+  function adicionarNome() {
+    if (!tipoAberto) {
+      alert("Selecione se você DEVE ou se DEVEM a você antes de adicionar um nome.");
+      return;
+    }
+
+    const input = document.getElementById("inputNome");
+    const nome = input.value.trim();
+
+    if (!nome) {
+      alert("Digite um nome válido.");
+      return;
+    }
+
+    if (!dividas[tipoAberto][nome]) {
+      dividas[tipoAberto][nome] = [];
+      salvarDados();
+      atualizarLista(tipoAberto);
+      input.value = '';
+      document.getElementById("formAdicionarNome").style.display = 'none';
+    } else {
+      alert("Esse nome já foi adicionado.");
+    }
+  }
+
+  // Salva o objeto dividas no localStorage
+  function salvarDados() {
+    localStorage.setItem('dividas', JSON.stringify(dividas));
+  }
+
+  // Volta ao menu principal e reseta seleções
+  function voltarMenu() {
+    nomeAberto = null;
+    tipoAberto = null;
+
+    document.getElementById("menu").style.display = "flex";
+    document.getElementById("devo").classList.remove("visible");
+    document.getElementById("devem").classList.remove("visible");
+    document.getElementById("btnAddDivida").style.display = "none";
+
+    ['devo', 'devem'].forEach(tipo => {
+      document.getElementById(`lista-nomes-${tipo}`).style.display = 'block';
+      document.getElementById(`detalhes-dividas-${tipo}`).style.display = 'none';
+    });
+
+    document.getElementById("formAdicionarNome").style.display = 'none';
+    document.getElementById("formAdicionarDivida").style.display = 'none';
+  }
+
+  // Atualiza a lista de nomes da seção atual
+  function atualizarLista(tipo) {
+    const listaContainer = document.getElementById(`lista-nomes-${tipo}`);
+    listaContainer.innerHTML = '';
+
+    const nomes = Object.keys(dividas[tipo]);
+
+    if (nomes.length === 0) {
+      listaContainer.innerHTML = '<i>Nenhum nome cadastrado.</i>';
+      return;
+    }
+
+    nomes.forEach(nome => {
+      const div = document.createElement('div');
+      div.className = 'nome-pessoa';
+      div.innerText = nome;
+      div.onclick = () => mostrarDetalhes(tipo, nome);
+      listaContainer.appendChild(div);
+    });
+  }
+
+  // Mostra detalhes das dívidas da pessoa selecionada
+  function mostrarDetalhes(tipo, nome) {
+    const container = document.getElementById(`detalhes-dividas-${tipo}`);
+    const listaNomes = document.getElementById(`lista-nomes-${tipo}`);
+
+    // Se clicar na mesma pessoa, fecha detalhes
+    if (nomeAberto === nome && tipoAberto === tipo) {
+      container.style.display = 'none';
+      listaNomes.style.display = 'block';
+      nomeAberto = null;
+      tipoAberto = null;
+      atualizarLista(tipo);
+      return;
+    }
+
+    nomeAberto = nome;
+    tipoAberto = tipo;
+    lista = dividas[tipo][nome] || [];
+
+    listaNomes.style.display = 'none';
+    container.style.display = 'block';
+
+    renderVisual();
+  }
+
+  // Renderiza as dívidas da pessoa na tela
+  function renderVisual() {
+    const container = document.getElementById(`detalhes-dividas-${tipoAberto}`);
+
+    if (!container || !lista) return;
+
+    container.innerHTML = `
+      <div class="quantidade">Dívidas com ${nomeAberto}</div>
+      <ul class="dividas-lista">
+        ${lista.map((d, i) => `
+          <li class="divida-item" id="divida-item-${i}">
+            <span><strong>Descrição:</strong> ${d.descricao}</span><br>
+            <span><strong>Valor:</strong> R$ ${parseFloat(d.valor).toFixed(2)}</span><br>
+            <span><strong>Data:</strong> ${d.data || '-'}</span><br>
+            <span><strong>Vencimento:</strong> ${d.vencimento || '-'}</span><br>
+            <span class="status ${d.status}">${d.status}</span><br>
+            <button onclick="editarDivida(${i})">Editar</button>
+            <button onclick="excluirDivida(${i})">Excluir</button>
+          </li>
+        `).join('')}
+      </ul>
+    `;
+  }
+
+  // Renderiza inputs para editar dívida
+  function renderEdit(i) {
+    const d = lista[i];
+    const li = document.getElementById(`divida-item-${i}`);
+    li.classList.add('edit-mode');
+
+    li.innerHTML = `
+      <input type="text" id="desc-edit-${i}" value="${d.descricao}" placeholder="Descrição" class="edit-input"/>
+      <input type="number" id="valor-edit-${i}" value="${parseFloat(d.valor)}" step="0.01" min="0" placeholder="Valor (R$)" class="edit-input"/>
+      <input type="date" id="data-edit-${i}" value="${d.data || ''}" class="edit-input"/>
+      <input type="date" id="vencimento-edit-${i}" value="${d.vencimento || ''}" class="edit-input"/>
+      <select id="status-edit-${i}" class="edit-select">
+        <option value="aberto" ${d.status === 'aberto' ? 'selected' : ''}>Aberto</option>
+        <option value="pago" ${d.status === 'pago' ? 'selected' : ''}>Pago</option>
+        <option value="parcial" ${d.status === 'parcial' ? 'selected' : ''}>Parcial</option>
+      </select>
+      <div class="edit-buttons">
+        <button onclick="salvarEdicao(${i})" class="btn-salvar">Salvar</button>
+        <button onclick="cancelarEdicao()" class="btn-cancelar">Cancelar</button>
+      </div>
+    `;
+  }
+
+  window.editarDivida = function(i) {
+    renderEdit(i);
+  };
+
+  window.salvarEdicao = function(i) {
+    const d = lista[i];
+    d.descricao = document.getElementById(`desc-edit-${i}`).value.trim();
+    d.valor = parseFloat(document.getElementById(`valor-edit-${i}`).value) || 0;
+    d.data = document.getElementById(`data-edit-${i}`).value;
+    d.vencimento = document.getElementById(`vencimento-edit-${i}`).value;
+    d.status = document.getElementById(`status-edit-${i}`).value;
+
+    if (!d.descricao) {
+      alert('Descrição não pode ficar vazia!');
+      return;
+    }
+
+    if (!dividas[tipoAberto]) dividas[tipoAberto] = {};
+    if (!nomeAberto) {
+      alert('Nenhum nome selecionado!');
+      return;
+    }
+    dividas[tipoAberto][nomeAberto] = lista;
+    salvarDados();
+
+    renderVisual();
+    atualizarLista(tipoAberto);
+
+    const item = document.getElementById(`divida-item-${i}`);
+    if (item) item.classList.remove('edit-mode');
+
+    alert('Dívida atualizada!');
+  };
+
+  window.cancelarEdicao = function() {
+    document.querySelectorAll('.divida-item.edit-mode').forEach(el => el.classList.remove('edit-mode'));
+    renderVisual();
+  };
+
+  // Excluir dívida
+  window.excluirDivida = function(i) {
+    if (confirm('Deseja realmente excluir essa dívida?')) {
+      lista.splice(i, 1);
+      dividas[tipoAberto][nomeAberto] = lista;
+      salvarDados();
+      renderVisual();
+      atualizarLista(tipoAberto);
+    }
+  };
+
+  // Inicializa listas ao carregar a página
+  atualizarLista('devo');
+  atualizarLista('devem');
+</script>
+</body>
+</html>
